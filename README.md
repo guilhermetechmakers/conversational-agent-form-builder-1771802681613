@@ -34,17 +34,52 @@ npm run build
 npm run preview
 ```
 
+## Development with API
+
+The landing page, signup, and login require the API server for full functionality (demo agent URL, auth).
+
+```bash
+# Option 1: Run both API server and Vite dev server
+npm run dev:full
+
+# Option 2: Run in separate terminals
+npm run server   # API on http://localhost:3001
+npm run dev     # Vite on http://localhost:5173 (proxies /api to server)
+```
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `VITE_API_URL` | API base URL (frontend) | `/api` (uses Vite proxy in dev) |
+| `API_PORT` | API server port | `3001` |
+| `VITE_APP_URL` | App URL for demo agent links | `http://localhost:5173` |
+
+### API Endpoints (Stubs)
+
+- `GET /api/demo-agent` — Returns demo agent public URL
+- `POST /api/auth/signup` — Create account (email, password, name?)
+- `POST /api/auth/login` — Authenticate
+- `POST /api/auth/sso/start` — SSO redirect URL (body: `{ provider: "google" \| "github" }`)
+
+Replace with production backend (Supabase, custom API) for deployment.
+
 ## Project Structure
 
 ```
 src/
+├── api/            # API client (auth, demo-agent)
 ├── components/     # Reusable UI components
-│   ├── layout/     # Sidebar, dashboard layout
+│   ├── auth/       # Password input, strength indicator
+│   ├── docs/       # Documentation layout
+│   ├── layout/     # Header, footer, sidebar, dashboard layout
 │   └── ui/         # Button, Card, Input, etc.
 ├── contexts/       # Auth context
-├── lib/            # API utilities, utils
-├── pages/          # Route pages
-└── routes.tsx      # Router configuration
+├── lib/            # API utilities, analytics stub, utils
+├── pages/          # Route pages (landing, docs, signup, login, etc.)
+├── docs-content/   # Markdown source for documentation
+├── public/assets/illustrations/  # Illustration kit
+└── server/         # API stub server
 ```
 
 ## Design System

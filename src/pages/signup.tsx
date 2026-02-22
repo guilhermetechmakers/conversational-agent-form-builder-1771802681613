@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Bot } from 'lucide-react'
+import { Bot, Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -14,16 +14,29 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { PasswordStrength } from '@/components/auth/password-strength'
 import { useAuth } from '@/contexts/auth-context'
+import { trackEvent } from '@/lib/analytics'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
-const signupSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  terms: z.boolean().refine((v) => v === true, 'You must accept the terms'),
-})
+const signupSchema = z
+  .object({
+    name: z.string().min(1, 'Name is required').max(255),
+    email: z.string().email('Invalid email address').max(255),
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+      .regex(/\d/, 'Password must contain at least one digit'),
+    confirmPassword: z.string(),
+    terms: z.boolean().refine((v) => v === true, 'You must accept the terms'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  })
 
 type SignupForm = z.infer<typeof signupSchema>
 
@@ -31,24 +44,34 @@ export function SignupPage() {
   const navigate = useNavigate()
   const { signup } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
-    defaultValues: { name: '', email: '', password: '', terms: false },
+    defaultValues: { name: '', email: '', password: '', confirmPassword: '', terms: false },
   })
 
+  const password = watch('password')
+
   const onSubmit = async (data: SignupForm) => {
+    trackEvent('signup_start')
     setIsLoading(true)
     try {
       await signup(data.email, data.password, data.name)
-      toast.success('Account created! Check your email to verify.')
+      trackEvent('signup_success')
+      toast.success('Account created! Welcome to Agent Builder.')
       navigate('/dashboard')
-    } catch {
-      toast.error('Something went wrong. Please try again.')
+    } catch (err: unknown) {
+      const message = err && typeof err === 'object' && 'message' in err
+        ? String((err as { message: string }).message)
+        : 'Something went wrong. Please try again.'
+      toast.error(message)
     } finally {
       setIsLoading(false)
     }
@@ -101,15 +124,53 @@ export function SignupPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="At least 8 characters"
-                {...register('password')}
-                className={cn(errors.password && 'border-destructive')}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Min 8 chars, 1 upper, 1 lower, 1 digit"
+                  {...register('password')}
+                  className={cn('pr-10', errors.password && 'border-destructive')}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              <PasswordStrength password={password} />
               {errors.password && (
                 <p className="text-sm text-destructive">{errors.password.message}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm password</Label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="Confirm your password"
+                  {...register('confirmPassword')}
+                  className={cn('pr-10', errors.confirmPassword && 'border-destructive')}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
               )}
             </div>
             <div className="flex items-start gap-2">
@@ -121,9 +182,13 @@ export function SignupPage() {
               />
               <Label htmlFor="terms" className="text-sm font-normal cursor-pointer">
                 I agree to the{' '}
-                <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>
-                {' '}and{' '}
-                <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+                <Link to="/terms" className="text-primary hover:underline">
+                  Terms of Service
+                </Link>{' '}
+                and{' '}
+                <Link to="/privacy" className="text-primary hover:underline">
+                  Privacy Policy
+                </Link>
               </Label>
             </div>
             {errors.terms && (
@@ -132,6 +197,24 @@ export function SignupPage() {
             <Button type="submit" className="w-full" isLoading={isLoading}>
               Create account
             </Button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <Button type="button" variant="outline" disabled>
+                Google (coming soon)
+              </Button>
+              <Button type="button" variant="outline" disabled>
+                GitHub (coming soon)
+              </Button>
+            </div>
           </form>
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Already have an account?{' '}

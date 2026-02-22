@@ -1,13 +1,8 @@
 import * as React from 'react'
-
-interface User {
-  id: string
-  email: string
-  name?: string
-}
+import { signup as apiSignup, login as apiLogin, type AuthUser } from '@/api/auth'
 
 interface AuthContextValue {
-  user: User | null
+  user: AuthUser | null
   isLoading: boolean
   isAuthenticated: boolean
   login: (email: string, password: string) => Promise<void>
@@ -18,31 +13,44 @@ interface AuthContextValue {
 const AuthContext = React.createContext<AuthContextValue | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = React.useState<User | null>(null)
+  const [user, setUser] = React.useState<AuthUser | null>(null)
   const [isLoading, setIsLoading] = React.useState(true)
 
   React.useEffect(() => {
     const token = localStorage.getItem('auth_token')
     if (token) {
-      // TODO: Validate token and fetch user
-      setUser({ id: '1', email: 'user@example.com', name: 'User' })
+      // Stub: In production, validate token and fetch user from API
+      const stored = localStorage.getItem('auth_user')
+      if (stored) {
+        try {
+          setUser(JSON.parse(stored))
+        } catch {
+          localStorage.removeItem('auth_token')
+          localStorage.removeItem('auth_user')
+        }
+      }
     }
     setIsLoading(false)
   }, [])
 
-  const login = React.useCallback(async (email: string, _password: string) => {
-    setUser({ id: '1', email, name: 'User' })
-    localStorage.setItem('auth_token', 'mock-token')
+  const login = React.useCallback(async (email: string, password: string) => {
+    const res = await apiLogin({ email, password })
+    localStorage.setItem('auth_token', res.token)
+    localStorage.setItem('auth_user', JSON.stringify(res.user))
+    setUser(res.user)
   }, [])
 
-  const signup = React.useCallback(async (email: string, _password: string, name?: string) => {
-    setUser({ id: '1', email, name })
-    localStorage.setItem('auth_token', 'mock-token')
+  const signup = React.useCallback(async (email: string, password: string, name?: string) => {
+    const res = await apiSignup({ email, password, name })
+    localStorage.setItem('auth_token', res.token)
+    localStorage.setItem('auth_user', JSON.stringify(res.user))
+    setUser(res.user)
   }, [])
 
   const logout = React.useCallback(() => {
     setUser(null)
     localStorage.removeItem('auth_token')
+    localStorage.removeItem('auth_user')
   }, [])
 
   const value: AuthContextValue = {

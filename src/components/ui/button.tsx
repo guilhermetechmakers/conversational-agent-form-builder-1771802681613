@@ -18,6 +18,8 @@ const buttonVariants = cva(
           'bg-destructive text-destructive-foreground hover:scale-[1.02] hover:opacity-90 active:scale-[0.98]',
         outline:
           'border border-border bg-transparent hover:bg-muted hover:scale-[1.02] active:scale-[0.98]',
+        'outline-orange':
+          'border-2 border-orange text-orange bg-transparent hover:bg-orange/10 hover:border-orange/80 hover:scale-[1.02] active:scale-[0.98]',
         ghost: 'hover:bg-muted hover:scale-[1.02] active:scale-[0.98]',
         link: 'text-primary underline-offset-4 hover:underline',
       },

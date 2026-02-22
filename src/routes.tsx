@@ -10,6 +10,12 @@ const DashboardPage = lazy(() => import('@/pages/dashboard').then((m) => ({ defa
 const CreateAgentPage = lazy(() => import('@/pages/create-agent').then((m) => ({ default: m.CreateAgentPage })))
 const PublicChatPage = lazy(() => import('@/pages/public-chat').then((m) => ({ default: m.PublicChatPage })))
 const PricingPage = lazy(() => import('@/pages/pricing').then((m) => ({ default: m.PricingPage })))
+const DocsIndexPage = lazy(() => import('@/pages/docs/index').then((m) => ({ default: m.DocsIndexPage })))
+const GettingStartedPage = lazy(() => import('@/pages/docs/getting-started').then((m) => ({ default: m.GettingStartedPage })))
+const ApiDocsPage = lazy(() => import('@/pages/docs/api').then((m) => ({ default: m.ApiDocsPage })))
+const WebhooksDocsPage = lazy(() => import('@/pages/docs/webhooks').then((m) => ({ default: m.WebhooksDocsPage })))
+const FaqsPage = lazy(() => import('@/pages/docs/faqs').then((m) => ({ default: m.FaqsPage })))
+const ContactPage = lazy(() => import('@/pages/docs/contact').then((m) => ({ default: m.ContactPage })))
 const NotFoundPage = lazy(() => import('@/pages/not-found').then((m) => ({ default: m.NotFoundPage })))
 
 function PageLoader() {
@@ -66,6 +72,54 @@ export const router = createBrowserRouter([
     element: (
       <LazyPage>
         <PricingPage />
+      </LazyPage>
+    ),
+  },
+  {
+    path: '/docs',
+    element: (
+      <LazyPage>
+        <DocsIndexPage />
+      </LazyPage>
+    ),
+  },
+  {
+    path: '/docs/getting-started',
+    element: (
+      <LazyPage>
+        <GettingStartedPage />
+      </LazyPage>
+    ),
+  },
+  {
+    path: '/docs/api',
+    element: (
+      <LazyPage>
+        <ApiDocsPage />
+      </LazyPage>
+    ),
+  },
+  {
+    path: '/docs/webhooks',
+    element: (
+      <LazyPage>
+        <WebhooksDocsPage />
+      </LazyPage>
+    ),
+  },
+  {
+    path: '/docs/faqs',
+    element: (
+      <LazyPage>
+        <FaqsPage />
+      </LazyPage>
+    ),
+  },
+  {
+    path: '/docs/contact',
+    element: (
+      <LazyPage>
+        <ContactPage />
       </LazyPage>
     ),
   },
@@ -133,12 +187,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/help',
-    element: (
-      <PlaceholderPage
-        title="Help & Documentation"
-        description="Searchable docs, FAQs, and support"
-      />
-    ),
+    element: <Navigate to="/docs" replace />,
   },
   {
     path: '/forgot-password',

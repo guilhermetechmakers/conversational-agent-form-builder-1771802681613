@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="heroMobileGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="rgb(79, 255, 143)" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="rgb(255, 122, 27)" stop-opacity="0.08"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="240" rx="12" fill="rgb(32, 32, 38)" stroke="rgb(49, 49, 58)"/>
+  <rect width="320" height="240" rx="12" fill="url(#heroMobileGrad)" opacity="0.5"/>
+  <circle cx="160" cy="100" r="40" stroke="rgb(79, 255, 143)" stroke-width="2" fill="rgb(79, 255, 143)" fill-opacity="0.1"/>
+  <path d="M148 100 L158 110 L178 90" stroke="rgb(79, 255, 143)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="60" y="160" width="200" height="50" rx="6" fill="rgb(32, 32, 38)" stroke="rgb(49, 49, 58)"/>
+  <line x1="80" y1="180" x2="220" y2="180" stroke="rgb(79, 255, 143)" stroke-width="1" opacity="0.6"/>
+  <line x1="80" y1="195" x2="180" y2="195" stroke="rgb(211, 211, 211)" stroke-width="1" opacity="0.4"/>
+</svg>

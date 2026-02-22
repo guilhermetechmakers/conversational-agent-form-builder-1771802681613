@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Bot } from 'lucide-react'
+import { Bot, Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { useAuth } from '@/contexts/auth-context'
+import { trackEvent } from '@/lib/analytics'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
@@ -29,6 +30,7 @@ export function LoginPage() {
   const navigate = useNavigate()
   const { login } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const {
     register,
@@ -43,10 +45,15 @@ export function LoginPage() {
     setIsLoading(true)
     try {
       await login(data.email, data.password)
+      trackEvent('login_success')
       toast.success('Welcome back!')
       navigate('/dashboard')
-    } catch {
-      toast.error('Invalid email or password')
+    } catch (err: unknown) {
+      const message =
+        err && typeof err === 'object' && 'message' in err
+          ? String((err as { message: string }).message)
+          : 'Invalid email or password'
+      toast.error(message)
     } finally {
       setIsLoading(false)
     }
@@ -95,12 +102,22 @@ export function LoginPage() {
                   Forgot password?
                 </Link>
               </div>
-              <Input
-                id="password"
-                type="password"
-                {...register('password')}
-                className={cn(errors.password && 'border-destructive')}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  {...register('password')}
+                  className={cn('pr-10', errors.password && 'border-destructive')}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               {errors.password && (
                 <p className="text-sm text-destructive">{errors.password.message}</p>
               )}
@@ -108,6 +125,24 @@ export function LoginPage() {
             <Button type="submit" className="w-full" isLoading={isLoading}>
               Log in
             </Button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <Button type="button" variant="outline" disabled>
+                Google (coming soon)
+              </Button>
+              <Button type="button" variant="outline" disabled>
+                GitHub (coming soon)
+              </Button>
+            </div>
           </form>
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{' '}
