@@ -1,73 +1,58 @@
-# React + TypeScript + Vite
+# Conversational Agent Form Builder
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A SaaS platform that lets teams design conversational, link-shareable "agents" that collect structured data via natural dialogue powered by LLMs.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Agent Builder**: Field-first schema with validation, persona, and context
+- **Public Links**: Unique URLs for each agent opening a full-page chat UI
+- **Conversational Capture**: LLM-driven dialogue that collects required fields naturally
+- **Dashboard**: Workspace-level views of agents, sessions, and analytics
+- **Integrations**: Webhooks and CRM connectors for lead delivery
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Framework**: React 19 with TypeScript
+- **Build**: Vite with SWC
+- **Styling**: Tailwind CSS v3 with CSS custom properties
+- **UI**: Radix UI primitives, custom components
+- **State**: TanStack React Query
+- **Forms**: React Hook Form with Zod validation
+- **Routing**: React Router v6
+- **Notifications**: Sonner
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```bash
+# Install dependencies
+npm install
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+# Build for production
+npm run build
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Preview production build
+npm run preview
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Project Structure
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+src/
+├── components/     # Reusable UI components
+│   ├── layout/     # Sidebar, dashboard layout
+│   └── ui/         # Button, Card, Input, etc.
+├── contexts/       # Auth context
+├── lib/            # API utilities, utils
+├── pages/          # Route pages
+└── routes.tsx      # Router configuration
+```
+
+## Design System
+
+- **Colors**: Deep charcoal (#1A1A1F), neon green (#4FFF8F), electric purple (#A259FF)
+- **Typography**: Inter font, 48-72px heroes
+- **Layout**: Collapsible sidebar, bento grids, card-based UI
+
+## License
+
+Private - All rights reserved.
